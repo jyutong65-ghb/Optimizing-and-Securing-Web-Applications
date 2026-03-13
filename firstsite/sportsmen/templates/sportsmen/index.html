@@ -1,19 +1,23 @@
 {% extends 'sportsmen/base.html' %}
 
-{% block title %}Main page{% endblock %}
-
 {% block content %}
-<h2>Main page</h2>
-<p>Welcome to the Sportsmen website!</p>
+<h1>{{ title }}</h1>
 
-<h3>Sportsmen List</h3>
-<ul>
-    {% for post in posts %}
-    <li>
-        <strong>{{ post.title }}</strong>: {{ post.content }}
-    </li>
-    {% empty %}
-    <li>No sportsmen yet.</li>
-    {% endfor %}
-</ul>
+{% if posts %}
+    <ul class="list-articles">
+        {% for p in posts %}
+        <li>
+            {% if p.photo %}
+                <img src="{{ p.photo.url }}" class="img-article-left" width="200">
+            {% endif %}
+            <h2>{{ p.title }}</h2>
+            <p>{{ p.content|linebreaks|truncatewords:30 }}</p>
+            <div class="clear"></div>
+            <p class="link-read-post"><a href="{% url 'post' p.pk %}">Read post</a></p>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No articles in this category yet.</p>
+{% endif %}
 {% endblock %}

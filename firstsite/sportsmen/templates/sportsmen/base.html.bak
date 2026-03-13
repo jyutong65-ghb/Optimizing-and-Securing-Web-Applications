@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sportsmen Site{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>Sportsmen Website</h1>
+        <nav>
+            <ul>
+                {% for item in menu %}
+                <li><a href="#">{{ item }}</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2026 Sportsmen</p>
+    </footer>
+</body>
+</html>

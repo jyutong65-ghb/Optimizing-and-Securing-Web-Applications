@@ -1,26 +1,68 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sportsmen Site{% endblock %}</title>
+    <title>{{ title }}</title>
+    <link type="text/css" href="{% static 'sportsmen/css/style.css' %}" rel="stylesheet"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="{% static 'sportsmen/images/main.ico' %}" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <header>
-        <h1>Sportsmen Website</h1>
-        <nav>
-            <ul>
-                {% for item in menu %}
-                <li><a href="#">{{ item }}</a></li>
-                {% endfor %}
-            </ul>
-        </nav>
-    </header>
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-    <footer>
-        <p>&copy; 2026 Sportsmen</p>
-    </footer>
+<table class="table-page" border=0 cellpadding="0" cellspacing="0">
+    <tr>
+        <td valign=top>
+            {% block mainmenu %}
+            <div class="header">
+                <ul id="mainmenu" class="mainmenu">
+                    <li class="logo"><a href="{% url 'index' %}"><div class="logo"></div></a></li>
+                    {% for m in menu %}
+                        {% if not forloop.last %}
+                            <li><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+                        {% else %}
+                            <li class="last"><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="clear"></div>
+            </div>
+            {% endblock mainmenu %}
+            <table class="table-content" border=0 cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top" class="left-chapters">
+                        <ul id="leftchapters">
+                            {% if sport_selected == 0 %}
+                                <li class="selected">All sports</li>
+                            {% else %}
+                                <li><a href="{% url 'index' %}">All sports</a></li>
+                            {% endif %}
+                            
+                            {% for s in sports %}
+                                {% if s.pk == sport_selected %}
+                                    <li class="selected">{{ s.name }}</li>
+                                {% else %}
+                                    <li><a href="{{ s.get_absolute_url }}">{{ s.name }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td valign="top" class="content">
+                        <div class="content-text">
+                            {% block content %}
+                            {% endblock %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td valign=top>
+            <div id="footer">
+                <p>&copy; 2026 Sportsmen</p>
+            </div>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
