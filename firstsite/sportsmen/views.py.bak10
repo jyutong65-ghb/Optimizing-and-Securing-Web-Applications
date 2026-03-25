@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.shortcuts import redirect
 from .models import Sportsman, Sports
-from .forms import AddArticleForm
 
 menu = [
     {'title': 'About', 'url_name': 'about'},
@@ -31,17 +31,10 @@ def contacts(request):
     return HttpResponse('<h1>Contact information</h1>')
 
 def addarticle(request):
-    if request.method == 'POST':
-        form = AddArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = AddArticleForm()
     return render(request, 'sportsmen/addarticle.html', {
         'menu': menu,
         'title': 'Add article',
-        'form': form
+        'sport_selected': 0,
     })
 
 def login(request):

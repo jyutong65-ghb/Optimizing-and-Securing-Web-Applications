@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.shortcuts import redirect
 from .models import Sportsman, Sports
-from .forms import AddArticleForm
 
 menu = [
     {'title': 'About', 'url_name': 'about'},
@@ -11,7 +11,7 @@ menu = [
 ]
 
 def index(request):
-    posts = Sportsman.objects.filter(is_published=True)
+    posts = Sportsman.objects.all()
     context = {
         'posts': posts,
         'menu': menu,
@@ -31,31 +31,16 @@ def contacts(request):
     return HttpResponse('<h1>Contact information</h1>')
 
 def addarticle(request):
-    if request.method == 'POST':
-        form = AddArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = AddArticleForm()
-    return render(request, 'sportsmen/addarticle.html', {
-        'menu': menu,
-        'title': 'Add article',
-        'form': form
-    })
+    return HttpResponse('<h1>Add article</h1>')
 
 def login(request):
     return HttpResponse('<h1>Log in</h1>')
 
 def contact(request):
-    return render(request, 'sportsmen/contact.html', {
-        'menu': menu,
-        'title': 'Contacts',
-        'sport_selected': 0,
-    })
+    return HttpResponse('<h1>Contacts</h1>')
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Sportsman, slug=post_slug)
+def show_post(request, post_id):
+    post = get_object_or_404(Sportsman, pk=post_id)
     context = {
         'post': post,
         'menu': menu,
@@ -64,14 +49,15 @@ def show_post(request, post_slug):
     }
     return render(request, 'sportsmen/post.html', context)
 
-def show_sport(request, sport_slug):
-    sport = get_object_or_404(Sports, slug=sport_slug)
-    posts = Sportsman.objects.filter(sport=sport, is_published=True)
+def show_sport(request, sport_id):
+    posts = Sportsman.objects.filter(sport_id=sport_id)
+    if not posts.exists():
+        raise Http404("No posts in this category")
     context = {
         'posts': posts,
         'menu': menu,
-        'title': f'{sport.name} articles',
-        'sport_selected': sport.id,
+        'title': f'{Sports.objects.get(pk=sport_id).name} articles',
+        'sport_selected': sport_id,
     }
     return render(request, 'sportsmen/index.html', context)
 

@@ -1,0 +1,16 @@
+from django import forms
+from .models import Sportsman, Sports
+
+class AddArticleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sport'].empty_label = 'Choose sport'
+
+    class Meta:
+        model = Sportsman
+        fields = ['title', 'slug', 'content', 'photo', 'is_published', 'sport']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-input'}),
+            'slug': forms.TextInput(attrs={'class': 'form-input'}),
+            'content': forms.Textarea(attrs={'cols': 50, 'rows': 12, 'class': 'form-input'}),
+        }
