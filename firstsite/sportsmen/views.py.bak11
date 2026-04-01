@@ -32,9 +32,9 @@ def contacts(request):
 
 def addarticle(request):
     if request.method == 'POST':
-        form = AddArticleForm(request.POST)
+        form = AddArticleForm(request.POST, request.FILES)
         if form.is_valid():
-            print(form.cleaned_data)
+            form.save()
             return redirect('index')
     else:
         form = AddArticleForm()

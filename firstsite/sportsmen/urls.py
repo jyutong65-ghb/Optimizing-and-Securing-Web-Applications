@@ -1,12 +1,13 @@
-from django.urls import path, re_path
+from django.urls import path
 from . import views
+from .views import SportsmenHome, SportsmenSport, ShowPost, AddArticle
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', SportsmenHome.as_view(), name='index'),
     path('about/', views.about, name='about'),
-    path('post/<slug:post_slug>/', views.show_post, name='post'),
-    path('sport/<slug:sport_slug>/', views.show_sport, name='sport'),
-    path('addarticle/', views.addarticle, name='add_article'),
+    path('addarticle/', AddArticle.as_view(), name='add_article'),
     path('contact/', views.contact, name='contact'),
     path('login/', views.login, name='login'),
+    path('post/<slug:post_slug>/', ShowPost.as_view(), name='post'),
+    path('sport/<slug:sport_slug>/', SportsmenSport.as_view(), name='sport'),
 ]

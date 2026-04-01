@@ -10,7 +10,7 @@
 </head>
 <body>
 <table class="table-page" border=0 cellpadding="0" cellspacing="0">
-      <tr><td valign=top>
+     <tr><td valign=top>
          {% block mainmenu %}
          <div class="header">
              <ul id="mainmenu" class="mainmenu">
@@ -27,7 +27,7 @@
          </div>
          {% endblock mainmenu %}
          <table class="table-content" border=0 cellpadding="0" cellspacing="0">
-              <tr>
+             <tr>
                  <td valign="top" class="left-chapters">
                      <ul id="leftchapters">
                          {% if sport_selected == 0 %}
@@ -35,50 +35,24 @@
                          {% else %}
                              <li><a href="{% url 'index' %}">All sports</a></li>
                          {% endif %}
-                         {% for s in sports %}
-                             {% if s.pk == sport_selected %}
-                                 <li class="selected">{{ s.name }}</li>
-                             {% else %}
-                                 <li><a href="{{ s.get_absolute_url }}">{{ s.name }}</a></li>
-                             {% endif %}
-                         {% endfor %}
+                         {% load sportsmen_tags %}
+                         {% show_sports sort='name' sport_selected=sport_selected %}
                      </ul>
-                  </td>
+                 </td>
                  <td valign="top" class="content">
                      <div class="content-text">
                          {% block content %}
                          {% endblock %}
                      </div>
-                     <!-- Pagination -->
-                     {% if page_obj.has_other_pages %}
-                     <div class="list-pages">
-                         <ul>
-                             {% if page_obj.has_previous %}
-                             <li><a href="?page={{ page_obj.previous_page_number }}">&lt;</a></li>
-                             {% endif %}
-                             {% for p in paginator.page_range %}
-                                 {% if page_obj.number == p %}
-                                     <li class="page-num-selected">{{ p }}</li>
-                                 {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
-                                     <li><a href="?page={{ p }}">{{ p }}</a></li>
-                                 {% endif %}
-                             {% endfor %}
-                             {% if page_obj.has_next %}
-                             <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a></li>
-                             {% endif %}
-                         </ul>
-                     </div>
-                     {% endif %}
-                     <!-- end Pagination -->
-                  </td>
-              </tr>
+                 </td>
+             </tr>
          </table>
-      </td></tr>
-      <tr><td valign=top>
+     </td></tr>
+     <tr><td valign=top>
          <div id="footer">
              <p>&copy; 2026 Sportsmen</p>
          </div>
-      </td></tr>
+     </td></tr>
 </table>
 </body>
 </html>

@@ -1,7 +1,10 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseNotFound
+from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
 from .models import Sportsman, Sports
 from .forms import AddArticleForm
+from .utils import DataMixin
 
 menu = [
     {'title': 'About', 'url_name': 'about'},
@@ -9,16 +12,6 @@ menu = [
     {'title': 'Contacts', 'url_name': 'contact'},
     {'title': 'Sign in', 'url_name': 'login'},
 ]
-
-def index(request):
-    posts = Sportsman.objects.filter(is_published=True)
-    context = {
-        'posts': posts,
-        'menu': menu,
-        'title': 'Main page',
-        'sport_selected': 0,
-    }
-    return render(request, 'sportsmen/index.html', context)
 
 def about(request):
     return render(request, 'sportsmen/about.html', {
@@ -30,20 +23,6 @@ def about(request):
 def contacts(request):
     return HttpResponse('<h1>Contact information</h1>')
 
-def addarticle(request):
-    if request.method == 'POST':
-        form = AddArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = AddArticleForm()
-    return render(request, 'sportsmen/addarticle.html', {
-        'menu': menu,
-        'title': 'Add article',
-        'form': form
-    })
-
 def login(request):
     return HttpResponse('<h1>Log in</h1>')
 
@@ -54,26 +33,63 @@ def contact(request):
         'sport_selected': 0,
     })
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Sportsman, slug=post_slug)
-    context = {
-        'post': post,
-        'menu': menu,
-        'title': post.title,
-        'sport_selected': post.sport_id,
-    }
-    return render(request, 'sportsmen/post.html', context)
-
-def show_sport(request, sport_slug):
-    sport = get_object_or_404(Sports, slug=sport_slug)
-    posts = Sportsman.objects.filter(sport=sport, is_published=True)
-    context = {
-        'posts': posts,
-        'menu': menu,
-        'title': f'{sport.name} articles',
-        'sport_selected': sport.id,
-    }
-    return render(request, 'sportsmen/index.html', context)
-
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>404 - Page Not Found</h1>')
+
+# ---------- Class-based views with DataMixin ----------
+class SportsmenHome(DataMixin, ListView):
+    model = Sportsman
+    template_name = 'sportsmen/index.html'
+    context_object_name = 'posts'
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Sportsman.objects.filter(is_published=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Main page')
+        return {**context, **c_def}
+
+class SportsmenSport(DataMixin, ListView):
+    model = Sportsman
+    template_name = 'sportsmen/index.html'
+    context_object_name = 'posts'
+    allow_empty = False
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Sportsman.objects.filter(
+            sport__slug=self.kwargs['sport_slug'],
+            is_published=True
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sport = Sports.objects.get(slug=self.kwargs['sport_slug'])
+        c_def = self.get_user_context(
+            title=f'Sport - {sport.name}',
+            sport_selected=sport.pk
+        )
+        return {**context, **c_def}
+
+class ShowPost(DataMixin, DetailView):
+    model = Sportsman
+    template_name = 'sportsmen/post.html'
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title=context['post'])
+        return {**context, **c_def}
+
+class AddArticle(DataMixin, CreateView):
+    form_class = AddArticleForm
+    template_name = 'sportsmen/addarticle.html'
+    success_url = reverse_lazy('index')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Add article')
+        return {**context, **c_def}
